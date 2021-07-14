@@ -1,0 +1,5 @@
+addi $t0, $zero, 1000
+sw $t0, 0($t0)
+addi $t0, $t0, 12
+lw $t1, 0($t0)
+sw $t0, 0($t1)

@@ -1,0 +1,257 @@
+=========================================
+#0(Basic)
+T1---
+addi $t0, $t0, 1000
+lw $s0, 0($t0)
+
+T2---
+addi $t0, $t0, 2000
+lw $s1, 0($t0)
+
+================================================
+#1 (Clone of each other)(No 2+ write at same clock cycle)
+
+T1---
+addi $t0, $zero, 1000
+lw $t1, 4($t0)
+addi $t2, $zero, 2
+addi $t3, $zero, 3
+addi $t4, $zero, 4
+addi $t5, $zero, 5
+addi $t2, $zero, 6
+addi $t3, $zero, 7
+addi $t4, $zero, 8
+addi $t5, $zero, 9
+addi $t2, $zero, 10
+addi $t3, $zero, 11
+addi $t4, $zero, 12
+addi $t5, $zero, 13
+addi $t2, $zero, 14
+addi $t3, $zero, 15
+addi $t4, $zero, 16
+addi $t5, $zero, 17
+
+T2---
+addi $t0, $zero, 1000
+lw $t1, 4($t0)
+addi $t2, $zero, 2
+addi $t3, $zero, 3
+addi $t4, $zero, 4
+addi $t5, $zero, 5
+addi $t2, $zero, 6
+addi $t3, $zero, 7
+addi $t4, $zero, 8
+addi $t5, $zero, 9
+addi $t2, $zero, 10
+addi $t3, $zero, 11
+addi $t4, $zero, 12
+addi $t5, $zero, 13
+addi $t2, $zero, 14
+addi $t3, $zero, 15
+addi $t4, $zero, 16
+addi $t5, $zero, 17
+
+T3---
+addi $t0, $zero, 1000
+lw $t1, 4($t0)
+addi $t2, $zero, 2
+addi $t3, $zero, 3
+addi $t4, $zero, 4
+addi $t5, $zero, 5
+addi $t2, $zero, 6
+addi $t3, $zero, 7
+addi $t4, $zero, 8
+addi $t5, $zero, 9
+addi $t2, $zero, 10
+addi $t3, $zero, 11
+addi $t4, $zero, 12
+addi $t5, $zero, 13
+addi $t2, $zero, 14
+addi $t3, $zero, 15
+addi $t4, $zero, 16
+addi $t5, $zero, 17
+================================================
+#2(value at memory address/registers)
+
+T1---
+addi $t0, $zero, 1000
+sw $t0, 0($t0)
+addi $t0, $t0, 12
+lw $t1, 0($t0)
+sw $t0, 0($t0)
+
+
+T2---
+addi $t0, $zero, 2000
+sw $t0, 0($t0)
+addi $t0, $t0, 12
+lw $t2, 0($t0)
+sw $t0, 0($t0)
+
+===============================================
+#3(Attempt to access out of range address)
+
+T1---
+addi $t0, $zero, 1000
+sw $t0, 0($t0)
+addi $t0, $t0, 12
+lw $t1, 0($t0)
+sw $t0, 0($t1)
+
+
+T2---
+addi $t0, $zero, 2000
+sw $t0, 0($t0)
+addi $t0, $t0, 12
+lw $t2, 0($t0)
+sw $t0, 0($t2)
+================================================
+#4(General(M=1000, M=100))
+
+T1---
+main:
+	addi $s0, $zero, 1000
+	addi $s1, $zero, 2500
+	addi $t0, $zero, 1
+	addi $t1, $zero, 2
+	addi $t2, $zero, 3
+	addi $t3, $zero, 4
+
+	sw $t0, 0($s0)	
+	sw $t1, 0($s1)	
+	
+	sw $t2, 4($s0)	
+	sw $t4, 4($s1)	
+	
+	lw $t5, 0($s0)
+	lw $t6, 0($s1)
+	lw $t7, 4($s0)
+	lw $t8, 4($s1)
+
+
+exit:
+
+T2---
+main:
+	addi $s0, $zero, 1000
+	addi $s1, $zero, 0
+	addi $s2, $zero, 10
+	addi $t1, $zero, 0
+
+initloop: 
+	addi $t1, $t1, 1
+	sw $t1, 0($s0)
+	addi $s0, $s0, 4
+	addi $s1, $s1, 1
+	slt $s3, $s1, $s2
+	bne $s3, $zero, initloop
+
+	addi $s0, $zero, 1000
+	addi $s1, $zero, 0
+	addi $s3, $zero, 0
+	addi $s2, $zero, 9
+
+sumloop:
+	lw $t0, 0($s0)
+	addi $s0, $s0, 4
+	lw $t1, 0($s0)
+	add $t2, $t0, $t1
+	sw $t2, 0($s0)
+	addi $s1, $s1, 1
+	slt $s3, $s1, $s2
+	bne $s3, $zero, sumloop
+
+exit:
+
+
+=====================================
+#5(MRM checking)
+
+T1---
+addi $t0, $zero, 1000
+lw $t1, 0($t0)
+lw $t2, 4($t0)
+lw $t3, 8($t0)
+lw $t4, 12($t0)
+
+===================================================
+#6(size limit of queue)
+T1---
+addi $t0, $zero, 500
+lw $t1, 0($t0)
+lw $t2, 4($t0)
+lw $t3, 8($t0)
+lw $t4, 12($t0)
+lw $t5, 16($t0)
+lw $t6, 20($t0)
+lw $t7, 24($t0)
+lw $t8, 28($t0)
+lw $s1, 32($t0)
+lw $s2, 36($t0)
+lw $s3, 40($t0)
+lw $s4, 44($t0)
+lw $s5, 48($t0)
+lw $s6, 52($t0)
+lw $s7, 56($t0)
+lw $a0, 60($t0)
+lw $t1, 64($t0)
+lw $t2, 68($t0)
+lw $t3, 72($t0)
+lw $t4, 76($t0)
+lw $t5, 80($t0)
+lw $t6, 84($t0)
+lw $t7, 88($t0)
+lw $t8, 92($t0)
+lw $t1, 96($t0)
+lw $t2, 100($t0)
+lw $t3, 104($t0)
+lw $t4, 108($t0)
+lw $t5, 112($t0)
+lw $t6, 116($t0)
+lw $t7, 120($t0)
+lw $t8, 124($t0)
+
+==========================================
+#7(___)
+T1---
+addi $t0, $zero, 1000
+lw $t1, 0($t0)
+lw $t2, 24($t0)
+lw $t3, 20($t0)
+
+
+T2---
+addi $t0, $zero, 1000
+lw $t4, 28($t0)
+lw $t5, 16($t0)
+lw $t6, 32($t0)
+
+
+=======================================
+#8(redundant statement)
+T1---
+lw $t0, 1000($t1)
+lw $t1, 1000($t1)
+add $t1, $t2, $t2
+
+T2---
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+
+sw $t1, 1000($zero)
+lw $t3, 1004($zero)
+sw $t3, 1004($zero)
+
+
+
+
+
+
+
+
+
+
+
+

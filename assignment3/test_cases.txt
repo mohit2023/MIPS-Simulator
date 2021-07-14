@@ -1,0 +1,223 @@
+
+======================================================================================
+test case 0 (given)
+
+main:
+	addi $s0, $zero, 1000
+	addi $s1, $zero, 2500
+	addi $t0, $zero, 1
+	addi $t1, $zero, 2
+	addi $t2, $zero, 3
+	addi $t3, $zero, 4
+
+	sw $t0, 0($s0)	
+	sw $t1, 0($s1)	
+	
+	sw $t2, 4($s0)	
+	sw $t4, 4($s1)	
+	
+	lw $t5, 0($s0)
+	lw $t6, 0($s1)
+	lw $t7, 4($s0)
+	lw $t8, 4($s1)
+
+
+exit:
+
+======================================================================================
+test case 1 (given)
+
+main:
+	addi $s0, $zero, 1000
+	addi $s1, $zero, 0
+	addi $s2, $zero, 10
+	addi $t1, $zero, 0
+
+initloop: 
+	addi $t1, $t1, 1
+	sw $t1, 0($s0)
+	addi $s0, $s0, 4
+	addi $s1, $s1, 1
+	slt $s3, $s1, $s2
+	bne $s3, $zero, initloop
+
+	addi $s0, $zero, 1000
+	addi $s1, $zero, 0
+	addi $s3, $zero, 0
+	addi $s2, $zero, 9
+
+sumloop:
+	lw $t0, 0($s0)
+	addi $s0, $s0, 4
+	lw $t1, 0($s0)
+	add $t2, $t0, $t1
+	sw $t2, 0($s0)
+	addi $s1, $s1, 1
+	slt $s3, $s1, $s2
+	bne $s3, $zero, sumloop
+
+exit:
+	
+==========================================================================================
+test casse 2 (given)
+
+main:
+	addi $s0, $zero, 5
+	addi $s1, $zero, 0
+	addi $s2, $zero, 1
+	addi $s3, $zero, 1
+	addi $s4, $zero, 1
+
+check: 
+	slt $t0, $s0, $s2
+	beq $t0, $zero, run
+	bne $t0, $zero, loopexit
+	
+run:
+	add $s1, $s1, $s0
+	mul $s3, $s3, $s0
+	sub $s0, $s0, $s4
+	j check
+	
+loopexit:
+	add $s1, $s1, $zero
+	mul $s3, $s3, $s4
+
+exit:		
+
+==========================================================================================
+test case 3 (zig-zag in sw)
+
+main:
+	addi $t0, $zero, 5
+	addi $t1, $zero, 2
+	addi $t2, $zero, 1
+	addi $t3, $zero, 4
+	sw $t0, 1000
+	sw $t1, 2500
+	sw $t2, 1004
+	sw $t3, 2504
+exit:
+
+==========================================================================================
+test case 4 (zig-zag in lw)
+
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+sw $t0, 1000
+sw $t1, 2500
+sw $t2, 1004
+sw $t3, 2504
+lw $t3, 1000
+lw $t2, 2500
+lw $t1, 1004
+lw $t0, 2504
+
+
+==========================================================================================
+test case 5 (lw using other row)
+
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+sw $t0, 2000
+sw $t1, 1024
+lw $t4, 2500
+lw $t0, 2000
+
+
+===========================================================================================
+test case 6 (blocking in bitween)
+
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+sw $t0, 1000
+sw $t1, 1004
+add $t1, $t1,$t1
+sw $t1, 1004
+lw $t1, 1004
+
+===========================================================================================
+test case 7 (general for all operation)
+
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+add $t4, $t0, $t1
+sub $t5, $t1, $t3
+beq $t0, $t5, exit
+slt $t6, $t5, $t3
+
+j exit
+exit:
+
+==========================================================================================
+test case 8 (same memory multiple sw, same register multiple lw (consecutive in queue))
+
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+sw $t0, 1000
+sw $t1, 1000
+sw $t2, 1000
+sw $t3, 1000
+lw $t5, 1004
+lw $t5, 1012
+lw $t5, 1008
+lw $t5, 2000
+
+=========================================================================================
+test case 9 (sw followed by lw at same memory (store to load transfer))
+
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+
+sw $t1, 1000($zero)
+sw $t3, 1004($zero)
+lw $t2, 1004($zero)
+
+=========================================================================================
+test case 10 (lw followed by sw when same memory and same registers are used)
+
+addi $t0, $zero, 5
+addi $t1, $zero, 2
+addi $t2, $zero, 1
+addi $t3, $zero, 4
+
+sw $t1, 1000($zero)
+lw $t3, 1004($zero)
+sw $t3, 1004($zero)
+
+======================================================================================
+test case 11 (negative numbers in memory)
+
+addi $t0, $zero, -30
+sw $t0, 1000($zero)
+addi $t1, $zero, -50
+sub $t0, $t1, $t0
+sw $t0, 1004($zero)
+lw $t0, 1000($zero)
+
+=======================================================================================
+test case 12 (exploits weakness)
+
+lw $t0, 1000($zero)
+lw $t0, 1004($zero)
+lw $t0, 1008($zero)
+
+=======================================================================================
+test case 13 (duplicate lw when previous one already in DRAM)
+
+lw $t0, 1000($zero)
+lw $t0, 1000($zero)
+
+
